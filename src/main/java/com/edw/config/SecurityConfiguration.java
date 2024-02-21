@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                                 .fullyAuthenticated()
                 .and()
                     .logout()
-                    .logoutSuccessUrl("http://localhost:8080/realms/external/protocol/openid-connect/logout?redirect_uri=http://localhost:8081/");
+                    .logoutSuccessUrl("http://localhost:8080/realms/external/protocol/openid-connect/logout");
 
         return http.build();
     }
