@@ -30,7 +30,7 @@ public class IndexController {
 //        }};
 
         model.addAttribute("user", user);
-        return "index";
+        return "/pages/landing_page";
     }
 
 
