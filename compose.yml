@@ -5,6 +5,26 @@ x-logging: &logging
     max-file: "3"
 
 services:
+  nginx:
+    image: nginx:1.19-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./ssl/conf:/etc/letsencrypt
+      - ./ssl/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    restart: always
+    volumes:
+      - ./ssl/conf:/etc/letsencrypt
+      - ./ssl/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
   postgres:
     image: postgres:${POSTGRES_VERSION}
     restart: unless-stopped
@@ -36,12 +56,19 @@ services:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       GF_URL: ${GF_HOSTNAME}:${GF_SERVER_HTTP_PORT}
+      GITLAB_URL: ${GITLAB_URL}
+      DASHBOARD_URL: ${DASHBOARD_URL}
       GF_ADMIN_USERNAME: ${GF_ADMIN_USERNAME}
       GF_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD}
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/server.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key
     ports:
-      - ${KC_PORT}:8080
+      - ${KC_HTTPS_PORT}:8443
+      - ${KC_HTTP_PORT}:8080
     volumes:
       - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json:ro
+      - ./ssl/server.crt:/opt/keycloak/conf/server.crt
+      - ./ssl/server.key:/opt/keycloak/conf/server.key
     logging: *logging
 
   prometheus:
@@ -79,10 +106,74 @@ services:
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "grafana"
       GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_NAME: "email:primary"
       GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email"
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: ${KC_HOSTNAME}:${KC_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/auth
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: http://keycloak:${KC_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/token
-      GF_AUTH_GENERIC_OAUTH_API_URL: ${KC_HOSTNAME}:${KC_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/userinfo
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: ${KC_HOSTNAME}:${KC_HTTP_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/auth
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: http://keycloak:${KC_HTTP_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: ${KC_HOSTNAME}:${KC_HTTP_PORT}/realms/${KC_REALM_NAME}/protocol/openid-connect/userinfo
     volumes:
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    logging: *logging
+
+#  gitlab:
+#    image: 'gitlab/gitlab-ce:latest'
+#    restart: unless-stopped
+#    hostname: 'localhost'
+#    container_name: gitlab-ce
+#    environment:
+#      GITLAB_OMNIBUS_CONFIG: |
+#        external_url 'http://localhost'
+#        gitlab_rails['omniauth_allow_single_sign_on'] = ['oauth2_generic', 'openid_connect']
+#        gitlab_rails['omniauth_auto_link_ldap_user'] = true
+#        gitlab_rails['omniauth_block_auto_created_users'] = true
+#        nginx['ssl_certificate'] = "/etc/ssl/certs/gitlab/server-cert.pem"
+#        nginx['ssl_certificate_key'] = "/etc/ssl/certs/gitlab/server.key"
+#    ports:
+#      - '8084:80'
+#      - '8443:443'
+#    extra_hosts:
+#      - 'dockerhost:192.168.3.12'
+#    volumes:
+#      - ./gitlab/config:/etc/gitlab
+#      - ./gitlab/logs:/var/log/gitlab
+#      - ./gitlab/data:/var/opt/gitlab
+#      - ./gitlab/ssl:/etc/ssl/certs/gitlab'
+#    shm_size: '256m'
+#    logging: *logging
+  docker-mysql:
+    image: mysql:8.0.26
+    hostname: mysql
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql-data/data:/var/lib/mysql
+      - ./mysql-data/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=jira_db
+      - MYSQL_PASSWORD=password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    logging: *logging
+
+  jira:
+    depends_on:
+      - docker-mysql
+    image: atlassian/jira-core:9.4.0-jdk11
+    container_name: jira-server
+    restart: always
+    tty: true
+    volumes:
+      - ./jira/data:/var/atlassian/application-data/jira
+      #- ./jira-server/postgresql-42.2.1.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/postgresql-42.2.1.jar
+      - ./jira/mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+      - ./jira/atlassian-extras-3.4.6.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/atlassian-extras-3.4.6.jar
+    ports:
+      - '8085:8080'
+    environment:
+      - 'JIRA_DATABASE_URL=mysql://localhost:3306/jira_db'
+      - 'JIRA_DB_PASSWORD=password'
+      - 'SETENV_JVM_MINIMUM_MEMORY=2048m'
+      - 'SETENV_JVM_MAXIMUM_MEMORY=4096m'
+      - 'JIRA_PROXY_NAME='
+      - 'JIRA_PROXY_PORT='
+      - 'JIRA_PROXY_SCHEME='
     logging: *logging

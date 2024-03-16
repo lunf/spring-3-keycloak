@@ -38,11 +38,13 @@ https://developers.redhat.com/articles/2023/07/24/how-integrate-spring-boot-3-sp
 docker compose up -d
 ```
 
-| App | Port | Username | Password
-|-|-|-|-
-| Keycloak | 8080 | `admin` | `keycloak`
-| Prometheus | 9090 | |
-| Grafana | 3000 | `admin` | `grafana`
+| App        | Port | Username | Password
+|------------|------|----------|-
+| Keycloak   | 8080 | `admin`  | `keycloak`
+| Prometheus | 9090 |          |
+| Grafana    | 3000 | `admin`  | `grafana`
+| Gitlab     | 8084 | `root`   | `brIyDjJaiZvEwxH43nOMZvd379vbbd/LMkKxkAsmd+U=`
+
 
 | Useful commands | Discription
 |-|-
@@ -50,7 +52,8 @@ docker compose up -d
 | `docker compose logs` | Shows logs of containers (`-f` to follow logs)
 | `docker compose down` | Stop and remove containers (`-v` remove named volumes declared in the volumes section of the Compose file and anonymous volumes attached to containers)
 | `docker system prune -a -f` | Remove all unused containers, networks, images (`--volumes` prune volumes)
-
+| `docker exec -it gitlab-ce grep 'Password:' /etc/gitlab/initial_root_password` | Find Gitlab root user
+| `export DOCKERHOST=$(ifconfig | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" | grep -v 127.0.0.1 | awk '{ print $2 }' | cut -f2 -d: | head -n1)` | Find machine IP address
 ---
 
 ## Disclaimer

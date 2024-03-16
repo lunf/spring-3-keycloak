@@ -1,47 +1,157 @@
-{
-  "id": "${KC_REALM_NAME}",
-  "realm": "${KC_REALM_NAME}",
-  "sslRequired": "none",
-  "enabled": true,
-  "eventsEnabled": true,
-  "eventsExpiration": 900,
-  "adminEventsEnabled": true,
-  "adminEventsDetailsEnabled": true,
-  "attributes": {
-    "adminEventsExpiration": "900"
+[
+  {
+    "id": "${KC_REALM_NAME}",
+    "realm": "${KC_REALM_NAME}",
+    "sslRequired": "none",
+    "enabled": true,
+    "eventsEnabled": true,
+    "eventsExpiration": 900,
+    "adminEventsEnabled": true,
+    "adminEventsDetailsEnabled": true,
+    "attributes": {
+      "adminEventsExpiration": "900"
+    },
+    "clients": [
+      {
+        "id": "grafana",
+        "clientId": "grafana",
+        "name": "grafana",
+        "enabled": true,
+        "publicClient": true,
+        "rootUrl": "${GF_URL}",
+        "adminUrl": "${GF_URL}",
+        "baseUrl": "${GF_URL}",
+        "redirectUris": [
+          "${GF_URL}/*"
+        ],
+        "webOrigins": [
+          "${GF_URL}"
+        ]
+      }
+    ],
+    "users": [
+      {
+        "id": "admin",
+        "email": "${GF_ADMIN_USERNAME}@admin.com",
+        "username": "${GF_ADMIN_USERNAME}",
+        "enabled": true,
+        "emailVerified": true,
+        "credentials": [
+          {
+            "temporary": false,
+            "type": "password",
+            "value": "${GF_ADMIN_PASSWORD}"
+          }
+        ]
+      }
+    ]
   },
-  "clients": [
-    {
-      "id": "grafana",
-      "clientId": "grafana",
-      "name": "grafana",
-      "enabled": true,
-      "publicClient": true,
-      "rootUrl": "${GF_URL}",
-      "adminUrl": "${GF_URL}",
-      "baseUrl": "${GF_URL}",
-      "redirectUris": [
-        "${GF_URL}/*"
-      ],
-      "webOrigins": [
-        "${GF_URL}"
+  {
+    "id": "external",
+    "realm": "external",
+    "sslRequired": "none",
+    "enabled": true,
+    "eventsEnabled": true,
+    "eventsExpiration": 900,
+    "adminEventsEnabled": true,
+    "adminEventsDetailsEnabled": true,
+    "attributes": {
+      "adminEventsExpiration": "900"
+    },
+    "clients": [
+      {
+        "id": "gitlab-client",
+        "clientId": "gitlab-client",
+        "name": "gitlab-client",
+        "protocol": "openid-connect",
+        "enabled": true,
+        "publicClient": true,
+        "standardFlowEnabled": true,
+        "serviceAccountsEnabled": true,
+        "authorizationServicesEnabled": true,
+        "directAccessGrantsEnabled": true,
+        "clientAuthenticatorType": "client-secret",
+        "secret": "BniyV90S7LYevocWFausJgOaA4kl2pWW",
+        "rootUrl": "${GITLAB_URL}",
+        "adminUrl": "${GITLAB_URL}",
+        "baseUrl": "${GITLAB_URL}",
+        "redirectUris": [
+          "${GITLAB_URL}/*"
+        ],
+        "webOrigins": [
+          "${GITLAB_URL}"
+        ],
+        "defaultClientScopes": [
+          "web-origins",
+          "acr",
+          "offline_access",
+          "profile",
+          "roles",
+          "email"
+        ],
+        "optionalClientScopes": [
+          "address",
+          "phone",
+          "microprofile-jwt"
+        ]
+      },
+      {
+        "id": "dashboard-client",
+        "clientId": "dashboard-client",
+        "name": "dashboard-client",
+        "protocol": "openid-connect",
+        "enabled": true,
+        "publicClient": true,
+        "standardFlowEnabled": true,
+        "serviceAccountsEnabled": true,
+        "authorizationServicesEnabled": true,
+        "directAccessGrantsEnabled": true,
+        "clientAuthenticatorType": "client-secret",
+        "secret": "y30In3edvyrUWq17OB9XNOPnFFTka22X",
+        "rootUrl": "${DASHBOARD_URL}",
+        "adminUrl": "${DASHBOARD_URL}",
+        "baseUrl": "${DASHBOARD_URL}",
+        "redirectUris": [
+          "${DASHBOARD_URL}/*"
+        ],
+        "webOrigins": [
+          "${DASHBOARD_URL}"
+        ],
+        "defaultClientScopes": [
+          "web-origins",
+          "acr",
+          "offline_access",
+          "profile",
+          "roles",
+          "email"
+        ],
+        "optionalClientScopes": [
+          "address",
+          "phone",
+          "microprofile-jwt"
+        ]
+      }
+    ],
+    "users": [
+      {
+        "id": "admin_general",
+        "email": "${GF_ADMIN_USERNAME}@domain.com",
+        "username": "${GF_ADMIN_USERNAME}",
+        "enabled": true,
+        "emailVerified": true,
+        "credentials": [
+          {
+            "temporary": false,
+            "type": "password",
+            "value": "${GF_ADMIN_PASSWORD}"
+          }
+        ],
+       "realmRoles": [
+         "offline_access",
+         "uma_authorization",
+         "default-roles-external"
       ]
-    }
-  ],
-  "users": [
-    {
-      "id": "admin",
-      "email": "${GF_ADMIN_USERNAME}@admin.com",
-      "username": "${GF_ADMIN_USERNAME}",
-      "enabled": true,
-      "emailVerified": true,
-      "credentials": [
-        {
-          "temporary": false,
-          "type": "password",
-          "value": "${GF_ADMIN_PASSWORD}"
-        }
-      ]
-    }
-  ]
-}
+      }
+    ]
+  }
+]
