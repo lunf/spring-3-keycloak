@@ -1,5 +1,8 @@
 package com.edw.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <pre>
@@ -19,6 +23,9 @@ import java.util.HashMap;
  */
 @Controller
 public class IndexController {
+
+    @Autowired
+    private LdapTemplate ldapTemplate;
 
     @GetMapping(path = "/")
     public String index(Model model) {
@@ -35,10 +42,12 @@ public class IndexController {
 
 
     @GetMapping(path = "/unauthenticated")
-    public HashMap unauthenticatedRequests() {
-        return new HashMap(){{
-            put("this is", "unauthenticated endpoint");
-        }};
+    public List<String> unauthenticatedRequests() {
+        return ldapTemplate
+                .search(
+                        "DC=company,DC=com",
+                        "sAMAccountName=username",
+                        (AttributesMapper<String>) attrs -> (String) attrs.get("cn").get());
     }
 
 }

@@ -29,7 +29,7 @@ public class LdapConnector {
                     "com.sun.jndi.ldap.LdapCtxFactory");
             env.put(Context.SECURITY_AUTHENTICATION, "Simple");
             env.put(Context.SECURITY_PRINCIPAL, "admin_username");
-            env.put(Context.SECURITY_CREDENTIALS, "admin_password");
+            env.put(Context.SECURITY_CREDENTIALS, "password");
             env.put(Context.PROVIDER_URL, "ldap://localhost:389");
             ctx = new InitialLdapContext(env, null);
             System.out.println("Connection Successful.");
