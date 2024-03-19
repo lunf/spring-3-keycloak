@@ -10,7 +10,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import java.sql.Timestamp;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Hashtable;
@@ -18,7 +18,7 @@ import java.util.Hashtable;
 public class LdapConnector {
     public static void main(String[] args) throws Exception {
         LdapContext context = getLdapContext();
-        getUserBasicAttributes("joe.done", context);
+        getUserBasicAttributes("john", context);
     }
 
     public static LdapContext getLdapContext(){
@@ -58,11 +58,15 @@ public class LdapConnector {
             if (answer.hasMore()) {
                 Attributes attrs = ((SearchResult) answer.next()).getAttributes();
                 System.out.println("distinguishedName "+ attrs.get("distinguishedName"));
+                System.out.println("displayName "+ attrs.get("displayName"));
+                System.out.println("cn "+ attrs.get("cn"));
                 System.out.println("sAMAccountName "+ attrs.get("sAMAccountName"));
                 System.out.println("sAMAccountType "+ attrs.get("sAMAccountType"));
                 System.out.println("givenname "+ attrs.get("givenname"));
                 System.out.println("sn "+ attrs.get("sn"));
+                System.out.println("name "+ attrs.get("name"));
                 System.out.println("mail "+ attrs.get("mail"));
+
                 System.out.println("userPrincipalName "+ attrs.get("userPrincipalName"));
                 System.out.println("telephonenumber "+ attrs.get("telephonenumber"));
 
@@ -86,6 +90,7 @@ public class LdapConnector {
                 Date date = new Date(stamp.getTime());
                 System.out.println(date);
 
+                System.out.println("--------------------------------------------------");
 
                 System.out.println("pwdLastSet "+ attrs.get("pwdLastSet"));
 
@@ -96,8 +101,13 @@ public class LdapConnector {
 
                 stamp = new Timestamp(millis);
                 date = new Date(stamp.getTime());
-                System.out.println(date);
+                System.out.println("password:" + date);
 
+                Instant instant = Instant.ofEpochMilli(millis);
+                ZonedDateTime localDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("UTC+07:00"));
+                formatter = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss");
+                System.out.println("password:" + localDateTime);
+                System.out.println("password:" + localDateTime.format(formatter));
 
                 for (NamingEnumeration it = attrs.getAll(); it.hasMore();) {
                     Attribute attribute = (Attribute) it.next();

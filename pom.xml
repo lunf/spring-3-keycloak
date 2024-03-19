@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.4</version>
+        <version>3.1.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -20,7 +20,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <org.thymeleaf.version>3.1.2.RELEASE</org.thymeleaf.version>
+        <org.thymeleaf.version>3.1.4.RELEASE</org.thymeleaf.version>
     </properties>
 
     <dependencies>

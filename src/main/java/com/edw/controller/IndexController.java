@@ -1,5 +1,8 @@
 package com.edw.controller;
 
+import com.edw.business.LdapService;
+import com.edw.domain.UserAttributeMapper;
+import com.edw.domain.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
@@ -9,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,7 +31,7 @@ import java.util.List;
 public class IndexController {
 
     @Autowired
-    private LdapTemplate ldapTemplate;
+    private LdapService ldapService;
 
     @GetMapping(path = "/")
     public String index(Model model) {
@@ -42,12 +48,21 @@ public class IndexController {
 
 
     @GetMapping(path = "/unauthenticated")
-    public List<String> unauthenticatedRequests() {
-        return ldapTemplate
-                .search(
-                        "DC=company,DC=com",
-                        "sAMAccountName=username",
-                        (AttributesMapper<String>) attrs -> (String) attrs.get("cn").get());
+    public ModelAndView unauthenticatedRequests() {
+
+//        UserDto user =  ldapTemplate
+//                .search(
+//                        "OU=COMPANY",
+//                        "sAMAccountName=username",
+//                        2,
+//                        new UserAttributeMapper()).stream().findFirst().orElse(null);
+
+        UserDto user = ldapService.findOne("username");
+
+        ModelAndView mav = new ModelAndView("details");
+        mav.addObject("user", user);
+
+        return mav;
     }
 
 }

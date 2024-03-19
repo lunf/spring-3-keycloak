@@ -22,7 +22,9 @@ public class WebConfiguration {
         contextSource.setUrl("ldap://localhost:389");
         contextSource.setUserDn("admin_username");
         contextSource.setPassword("password");
+        contextSource.setBase("DC=company,DC=com");
         contextSource.setPooled(true);
+
 
         return contextSource;
     }

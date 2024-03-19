@@ -1,0 +1,14 @@
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+
+
+<div>
+    <div th:text="${user.displayName}">1</div>
+    <br>
+    <div th:text="${user.email}">Text ...</div>
+    <br>
+    <div th:text="${user.accountName}">Text ...</div>
+    <br>
+    <div th:text="${user.pwdLastSet}">Text ...</div>
+<!--    <p th:text="${#dates.parse(user.pwdLastSet, 'dd-MMM-yyyy HH:mm:ss')}">Date</p>-->
+
+</div>
