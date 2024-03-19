@@ -5,25 +5,25 @@ x-logging: &logging
     max-file: "3"
 
 services:
-  nginx:
-    image: nginx:1.19-alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./ssl/conf:/etc/letsencrypt
-      - ./ssl/www:/var/www/certbot
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-
-  certbot:
-    image: certbot/certbot
-    restart: always
-    volumes:
-      - ./ssl/conf:/etc/letsencrypt
-      - ./ssl/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+#  nginx:
+#    image: nginx:1.19-alpine
+#    restart: always
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./nginx:/etc/nginx/conf.d
+#      - ./ssl/conf:/etc/letsencrypt
+#      - ./ssl/www:/var/www/certbot
+#    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+#
+#  certbot:
+#    image: certbot/certbot
+#    restart: always
+#    volumes:
+#      - ./ssl/conf:/etc/letsencrypt
+#      - ./ssl/www:/var/www/certbot
+#    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   postgres:
     image: postgres:${POSTGRES_VERSION}
@@ -139,41 +139,41 @@ services:
 #      - ./gitlab/ssl:/etc/ssl/certs/gitlab'
 #    shm_size: '256m'
 #    logging: *logging
-  docker-mysql:
-    image: mysql:8.0.26
-    hostname: mysql
-    restart: always
-    tty: true
-    volumes:
-      - ./mysql-data/data:/var/lib/mysql
-      - ./mysql-data/init.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=jira_db
-      - MYSQL_PASSWORD=password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    logging: *logging
-
-  jira:
-    depends_on:
-      - docker-mysql
-    image: atlassian/jira-core:9.4.0-jdk11
-    container_name: jira-server
-    restart: always
-    tty: true
-    volumes:
-      - ./jira/data:/var/atlassian/application-data/jira
-      #- ./jira-server/postgresql-42.2.1.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/postgresql-42.2.1.jar
-      - ./jira/mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
-      - ./jira/atlassian-extras-3.4.6.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/atlassian-extras-3.4.6.jar
-    ports:
-      - '8085:8080'
-    environment:
-      - 'JIRA_DATABASE_URL=mysql://localhost:3306/jira_db'
-      - 'JIRA_DB_PASSWORD=password'
-      - 'SETENV_JVM_MINIMUM_MEMORY=2048m'
-      - 'SETENV_JVM_MAXIMUM_MEMORY=4096m'
-      - 'JIRA_PROXY_NAME='
-      - 'JIRA_PROXY_PORT='
-      - 'JIRA_PROXY_SCHEME='
-    logging: *logging
+#  docker-mysql:
+#    image: mysql:8.0.26
+#    hostname: mysql
+#    restart: always
+#    tty: true
+#    volumes:
+#      - ./mysql-data/data:/var/lib/mysql
+#      - ./mysql-data/init.sql:/docker-entrypoint-initdb.d/init.sql
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=password
+#      - MYSQL_DATABASE=jira_db
+#      - MYSQL_PASSWORD=password
+#      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+#    logging: *logging
+#
+#  jira:
+#    depends_on:
+#      - docker-mysql
+#    image: atlassian/jira-core:9.4.0-jdk11
+#    container_name: jira-server
+#    restart: always
+#    tty: true
+#    volumes:
+#      - ./jira/data:/var/atlassian/application-data/jira
+#      #- ./jira-server/postgresql-42.2.1.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/postgresql-42.2.1.jar
+#      - ./jira/mysql-connector-j-8.0.31.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/mysql-connector-j-8.0.31.jar
+#      - ./jira/atlassian-extras-3.4.6.jar:/opt/atlassian/jira/atlassian-jira/WEB-INF/lib/atlassian-extras-3.4.6.jar
+#    ports:
+#      - '8085:8080'
+#    environment:
+#      - 'JIRA_DATABASE_URL=mysql://localhost:3306/jira_db'
+#      - 'JIRA_DB_PASSWORD=password'
+#      - 'SETENV_JVM_MINIMUM_MEMORY=2048m'
+#      - 'SETENV_JVM_MAXIMUM_MEMORY=4096m'
+#      - 'JIRA_PROXY_NAME='
+#      - 'JIRA_PROXY_PORT='
+#      - 'JIRA_PROXY_SCHEME='
+#    logging: *logging
