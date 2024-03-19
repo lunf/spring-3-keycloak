@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -7,7 +9,7 @@
 <body>
 <div class="main-content container-fluid" layout:fragment="content">
 <div class="page-title">
-    <h3>Dashboard</h3>
+    <h3>Hello  <span sec:authentication="principal.name"/></h3>
     <p class="text-subtitle text-muted">A very good dashboard to display your statistics</p>
 </div>
 <section class="section">

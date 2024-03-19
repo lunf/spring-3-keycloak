@@ -58,6 +58,56 @@
     "attributes": {
       "adminEventsExpiration": "900"
     },
+    "roles": {
+      "realm": [
+        {
+          "id": "d4adba7f-602a-4192-9b3a-b4efa3a64d55",
+          "name": "offline_access",
+          "description": "${role_offline-access}",
+          "composite": false,
+          "clientRole": false,
+          "containerId": "external",
+          "attributes": {}
+        },
+        {
+          "id": "9fd31a9a-9589-4db7-91dd-706fe801050c",
+          "name": "default-roles-external",
+          "description": "${role_default-roles}",
+          "composite": true,
+          "composites": {
+            "realm": [
+              "offline_access"
+            ],
+            "client": {
+              "account": [
+                "view-profile",
+                "manage-account"
+              ]
+            }
+          },
+          "clientRole": false,
+          "containerId": "external",
+          "attributes": {}
+        },
+        {
+          "id": "b05d55cd-dba9-4d7e-b0c3-991e0c620042",
+          "name": "user",
+          "description": "",
+          "composite": false,
+          "clientRole": false,
+          "containerId": "external",
+          "attributes": {}
+        },
+        {
+          "id": "fd243021-b4fc-4afb-92f0-fc792b1d01ac",
+          "name": "uma_authorization",
+          "composite": false,
+          "clientRole": false,
+          "containerId": "external",
+          "attributes": {}
+        }
+      ]
+    },
     "clients": [
       {
         "id": "gitlab-client",
@@ -149,7 +199,8 @@
        "realmRoles": [
          "offline_access",
          "uma_authorization",
-         "default-roles-external"
+         "default-roles-external",
+         "user"
       ]
       }
     ]
